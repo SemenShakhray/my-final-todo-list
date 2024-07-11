@@ -22,9 +22,17 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+var password string
+
+func init() {
+	env := os.Getenv("TODO_PASSWORD")
+	if len(env) > 0 {
+		password = env
+	}
+}
+
 func Authorization(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		password := os.Getenv("TODO_PASSWORD")
 		if len(password) > 0 {
 			cookie, err := r.Cookie("token")
 			if err != nil {
@@ -62,8 +70,7 @@ func SigninHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	expectedPassword := os.Getenv("TODO_PASSWORD")
-	if expectedPassword == "" || pass.Password != expectedPassword {
+	if password == "" || pass.Password != password {
 		http.Error(w, `{"error":"Неверный пароль"}`, http.StatusUnauthorized)
 		return
 	}
