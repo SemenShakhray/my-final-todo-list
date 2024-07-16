@@ -2,25 +2,19 @@ package handler
 
 import (
 	"encoding/json"
-	"go-final-project/interal/storage"
-	"go-final-project/interal/task"
-	"go-final-project/repeat"
 	"log"
 	"net/http"
 	"time"
+
+	"go-final-project/config"
+	"go-final-project/interal/storage"
+	"go-final-project/interal/task"
+	"go-final-project/repeat"
 )
 
 type Response struct {
 	ID    string `json:"id,omitempty"`
 	Error string `json:"error,omitempty"`
-}
-
-const layout = "20060102"
-
-func writeErrorResponse(w http.ResponseWriter, err error, statusCode int) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	json.NewEncoder(w).Encode(Response{Error: err.Error()})
 }
 
 func HandlerPostGetPutTask(store storage.Store) http.HandlerFunc {
@@ -30,13 +24,12 @@ func HandlerPostGetPutTask(store storage.Store) http.HandlerFunc {
 		case r.Method == http.MethodPost:
 			err := json.NewDecoder(r.Body).Decode(&t)
 			if err != nil {
-				writeErrorResponse(w, err, http.StatusBadRequest)
-				// http.Error(w, `{"error":"ошибка десериализации JSON"}`, http.StatusBadRequest)
+				http.Error(w, `{"error":"ошибка десериализации JSON"}`, http.StatusBadRequest)
 				return
 			}
 			id, err := store.PostTask(t)
 			if err != nil {
-				writeErrorResponse(w, err, http.StatusBadRequest)
+				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
 
@@ -44,8 +37,7 @@ func HandlerPostGetPutTask(store storage.Store) http.HandlerFunc {
 
 			w.Header().Set("Content-Type", "application/json")
 			if err := json.NewEncoder(w).Encode(resp); err != nil {
-				writeErrorResponse(w, err, http.StatusBadRequest)
-				// http.Error(w, `{"error":"Ошибка кодирования JSON"}`, http.StatusInternalServerError)
+				http.Error(w, `{"error":"Ошибка кодирования JSON"}`, http.StatusInternalServerError)
 				return
 			}
 
@@ -119,7 +111,7 @@ func HandlerNextDate(w http.ResponseWriter, r *http.Request) {
 	date := r.URL.Query().Get("date")
 	strRepeat := r.URL.Query().Get("repeat")
 
-	now, err := time.Parse(layout, strnow)
+	now, err := time.Parse(config.Layout, strnow)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -127,7 +119,10 @@ func HandlerNextDate(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
-	w.Write([]byte(nextdate))
+	_, err = w.Write([]byte(nextdate))
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func HandlerDone(store storage.Store) http.HandlerFunc {

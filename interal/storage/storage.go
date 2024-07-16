@@ -3,15 +3,16 @@ package storage
 import (
 	"database/sql"
 	"fmt"
-	"go-final-project/interal/task"
-	"go-final-project/repeat"
 	"strconv"
 	"time"
+
+	"go-final-project/config"
+	"go-final-project/interal/task"
+	"go-final-project/repeat"
 )
 
 const (
-	layout = "20060102"
-	limit  = 20
+	limit = 20
 )
 
 type Store struct {
@@ -110,10 +111,10 @@ func (s *Store) SearchTask(search string) ([]task.Task, error) {
 	var rows *sql.Rows
 	var err error
 	if search == "" {
-		rows, err = s.db.Query("SELECT * FROM scheduler ORDER BY date LIMIT ?", 20)
+		rows, err = s.db.Query("SELECT * FROM scheduler ORDER BY date LIMIT ?", limit)
 	} else if date, error := time.Parse("02.01.2006", search); error == nil {
 		query := "SELECT * FROM scheduler WHERE date = ? ORDER BY date LIMIT ?"
-		rows, err = s.db.Query(query, date.Format(layout), 20)
+		rows, err = s.db.Query(query, date.Format(config.Layout), limit)
 	} else {
 		search = "%%%" + search + "%%%"
 		query := "SELECT * FROM scheduler WHERE title LIKE ? OR comment LIKE ? ORDER BY date LIMIT ?"

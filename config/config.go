@@ -4,6 +4,8 @@ import (
 	"os"
 )
 
+const Layout = "20060102"
+
 type TodoEnv struct {
 	Port     string
 	DBFile   string

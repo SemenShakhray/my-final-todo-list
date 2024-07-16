@@ -2,12 +2,12 @@ package task
 
 import (
 	"fmt"
-	"go-final-project/repeat"
 	"strconv"
 	"time"
-)
 
-const layout = "20060102"
+	"go-final-project/config"
+	"go-final-project/repeat"
+)
 
 type Task struct {
 	ID      string `json:"id"`
@@ -37,9 +37,9 @@ func (t *Task) CheckTitle() error {
 
 func (t *Task) CheckData() (time.Time, error) {
 	if t.Date == "" {
-		t.Date = time.Now().Format(layout)
+		t.Date = time.Now().Format(config.Layout)
 	}
-	parseDate, err := time.Parse(layout, t.Date)
+	parseDate, err := time.Parse(config.Layout, t.Date)
 	if err != nil {
 		return time.Time{}, fmt.Errorf(`{"error":"Дата указана в неверном формате"}`)
 	}
@@ -52,11 +52,11 @@ func (t *Task) CheckRepeat(parseDate time.Time) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf(`{"error":"Неверное правило повторения"}`)
 		}
-		if parseDate.Before(time.Now()) && t.Date != time.Now().Format(layout) {
+		if parseDate.Before(time.Now()) && t.Date != time.Now().Format(config.Layout) {
 			t.Date = nextDate
 		}
 	} else if parseDate.Before(time.Now()) {
-		t.Date = time.Now().Format(layout)
+		t.Date = time.Now().Format(config.Layout)
 	}
 	return t.Date, nil
 }

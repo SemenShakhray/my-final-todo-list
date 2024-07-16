@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+
 	"go-final-project/auth"
 	"go-final-project/config"
 	"go-final-project/db"
 	"go-final-project/interal/handler"
 	"go-final-project/interal/storage"
-	"net/http"
-	"os"
 
 	"github.com/go-chi/chi"
 )
