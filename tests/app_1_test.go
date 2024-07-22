@@ -31,6 +31,7 @@ func getBody(path string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+	fmt.Println(path)
 	body, err := io.ReadAll(resp.Body)
 	return body, err
 }
