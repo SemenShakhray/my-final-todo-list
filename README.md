@@ -19,5 +19,5 @@ docker build --tag my_app:v1 .
 
 5. Запуск контейнера осуществляется командой
 ```go
-docker run -d --name myapp -p 7540:7540 -e TODO_DBFILE=/data/scheduler.db -e TODO_PASSWORD=privet -v "ваш путь к файлу":/data/scheduler.db  my_app:v1
+docker run -d --name myapp -p 7540:7540 -e TODO_DBFILE=/data/scheduler.db -e TODO_PASSWORD=privet -v data/scheduler.db  my_app:v1
 ```
